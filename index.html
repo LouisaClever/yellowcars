@@ -41,6 +41,26 @@
       opacity: 0; /* unsichtbar, aber nimmt Platz ein */
       pointer-events: none;
     }
+
+    /* Button unten rechts */
+    #map-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: GeistMono-Bold, sans-serif;
+      transition: background 0.3s;
+      z-index: 10;
+    }
+    #map-button:hover {
+      background: #444;
+    }
   </style>
 </head>
 <body>
@@ -51,6 +71,9 @@
       <path d="M2380.39 4546.88C2943.56 4670.55 4284.19 4807.98 5141.39 4368.38C5278.72 4299.72 5512.19 4277.78 5347.39 4739.38C5141.39 5316.38 3855.33 7198.38 2174.39 5783.38M1336.39 1744.89C832.556 1772.39 -136.61 1758.69 17.3896 1483.89C209.89 1140.39 896.39 1373.39 1239.89 947.885C1583.39 522.385 1651.89 -96.1149 2723.39 13.8851C3794.89 123.885 3698.89 1387.88 3314.39 2239.38C2929.89 3090.88 2242.89 3956.88 3314.39 3887.88C4385.89 3818.88 5388.39 4217.38 6913.39 2733.88C7270.39 3842.05 7517.39 6170.98 5649.39 6621.38C3314.39 7184.38 -353.11 6992.38 319.89 4739.38C452.556 4400.55 896.49 3549.78 1610.89 2857.38C2325.29 2164.98 1725.56 1827.22 1336.39 1744.89Z" stroke="none"/>
     </svg>
   </div>
+
+  <!-- Button unten rechts -->
+  <button id="map-button">🌍 Karte</button>
 
   <script>
     const numOfPhotos = 100;
@@ -82,16 +105,15 @@
         const position = (pathLength / (numOfPhotos - 1)) * i;
         const point = path.getPointAtLength(position);
 
-        // Position im Container (ohne svgRect.left/top)
         const x = point.x * scaleX;
         const y = point.y * scaleY;
 
         const rect = foto.getBoundingClientRect();
-        const containerRect = document.querySelector('.container').getBoundingClientRect();
+        const svgRectLeft = svgRect.left;
+        const svgRectTop = svgRect.top;
 
-        // Delta berechnen: Grid-Position -> Zielpunkt
-        const deltaX = x + svgRect.left - rect.left;
-        const deltaY = y + svgRect.top - rect.top;
+        const deltaX = x + svgRectLeft - rect.left;
+        const deltaY = y + svgRectTop - rect.top;
 
         setTimeout(() => {
           foto.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
@@ -110,7 +132,9 @@
     }
 
     let inSvg = false;
-    window.addEventListener("click", () => {
+    window.addEventListener("click", (event) => {
+      if (event.target.id === "map-button") return; // Klick auf Button ignorieren
+
       if (!inSvg) {
         document.querySelector(".container").classList.remove("grid-layout");
         positionImages();
@@ -118,6 +142,12 @@
         resetToGrid();
       }
       inSvg = !inSvg;
+    });
+
+    // Button öffnet map.html
+    document.getElementById("map-button").addEventListener("click", () => {
+      window.location.href = "map.html"; // gleiche Seite
+      // Oder: window.open("map.html", "_blank"); // neuer Tab
     });
   </script>
 
