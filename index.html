@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latigre - Coming Soon</title>
+  <link rel="stylesheet" href="main.css">
+  <style>
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 8px;
+      padding: 10px;
+      justify-items: center;
+      align-items: center;
+    }
+
+    .foto {
+      width: 100px;
+      height: auto;
+      transition: transform 1.5s ease, opacity 0.5s ease;
+      will-change: transform;
+    }
+
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
+      opacity: 0; /* unsichtbar, aber nimmt Platz ein */
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container grid-layout">
+    <!-- Unsichtbares SVG für die Pfad-Positionierung -->
+    <svg viewBox="0 0 7164 6890" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <path d="M2380.39 4546.88C2943.56 4670.55 4284.19 4807.98 5141.39 4368.38C5278.72 4299.72 5512.19 4277.78 5347.39 4739.38C5141.39 5316.38 3855.33 7198.38 2174.39 5783.38M1336.39 1744.89C832.556 1772.39 -136.61 1758.69 17.3896 1483.89C209.89 1140.39 896.39 1373.39 1239.89 947.885C1583.39 522.385 1651.89 -96.1149 2723.39 13.8851C3794.89 123.885 3698.89 1387.88 3314.39 2239.38C2929.89 3090.88 2242.89 3956.88 3314.39 3887.88C4385.89 3818.88 5388.39 4217.38 6913.39 2733.88C7270.39 3842.05 7517.39 6170.98 5649.39 6621.38C3314.39 7184.38 -353.11 6992.38 319.89 4739.38C452.556 4400.55 896.49 3549.78 1610.89 2857.38C2325.29 2164.98 1725.56 1827.22 1336.39 1744.89Z" stroke="none"/>
+    </svg>
+  </div>
+
+  <script>
+    const numOfPhotos = 100;
+
+    // Bilder erzeugen
+    for (let i = 1; i <= numOfPhotos; i++) {
+      let img = document.createElement("img");
+      img.id = `foto${i}`;
+      img.className = "foto";
+      img.src = `foto/foto${i}.png`;
+      img.alt = `Foto ${i}`;
+      document.querySelector(".container").appendChild(img);
+    }
+
+    function positionImages() {
+      const svg = document.querySelector('svg');
+      const path = svg.querySelector('path');
+
+      const svgRect = svg.getBoundingClientRect();
+      const viewBox = svg.viewBox.baseVal;
+      const scaleX = svgRect.width / viewBox.width;
+      const scaleY = svgRect.height / viewBox.height;
+
+      const pathLength = path.getTotalLength();
+
+      for (let i = 0; i < numOfPhotos; i++) {
+        const foto = document.getElementById(`foto${i + 1}`);
+
+        const position = (pathLength / (numOfPhotos - 1)) * i;
+        const point = path.getPointAtLength(position);
+
+        // Position im Container (ohne svgRect.left/top)
+        const x = point.x * scaleX;
+        const y = point.y * scaleY;
+
+        const rect = foto.getBoundingClientRect();
+        const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+        // Delta berechnen: Grid-Position -> Zielpunkt
+        const deltaX = x + svgRect.left - rect.left;
+        const deltaY = y + svgRect.top - rect.top;
+
+        setTimeout(() => {
+          foto.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        }, i * 20);
+      }
+    }
+
+    function resetToGrid() {
+      const container = document.querySelector(".container");
+      container.classList.add("grid-layout");
+
+      for (let i = 0; i < numOfPhotos; i++) {
+        const foto = document.getElementById(`foto${i + 1}`);
+        foto.style.transform = "translate(0, 0)";
+      }
+    }
+
+    let inSvg = false;
+    window.addEventListener("click", () => {
+      if (!inSvg) {
+        document.querySelector(".container").classList.remove("grid-layout");
+        positionImages();
+      } else {
+        resetToGrid();
+      }
+      inSvg = !inSvg;
+    });
+  </script>
+
+</body>
+</html>
