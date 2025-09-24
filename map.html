@@ -6,7 +6,7 @@
   <title>Fotos auf Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <style>
-    body, html { margin: 0; height: 100%; }
+    body, html { margin: 0; height: 100%; cursor: pointer; }
     #map { width: 100vw; height: 100vh; }
     .foto-overlay img { 
       width: 50px; 
@@ -14,7 +14,6 @@
       border-radius: 8px;
       transform: translate(-50%, -50%);
       pointer-events: none; 
-      
     }
   </style>
 </head>
@@ -151,6 +150,11 @@
     // Automatisch an alle Fotos anpassen
     const bounds = koordinaten.map(p => [p.lat, p.lng]);
     if(bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+
+    // Klick auf Body → zurück zur index.html
+    document.body.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    }, { once: true }); // nur einmal
   </script>
 </body>
 </html>
