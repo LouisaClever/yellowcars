@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotos auf Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body, html { margin: 0; height: 100%; }
+    #map { width: 100vw; height: 100vh; }
+    .foto-overlay img { 
+      width: 50px; 
+      height: 50px; 
+      border-radius: 8px;
+      transform: translate(-50%, -50%);
+      pointer-events: none; 
+      
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Alle 100 Fotos mit Koordinaten
+    const koordinaten = [
+      { "src": "foto/foto1.png", "lat": 53.57993, "lng": 10.02315 },
+      { "src": "foto/foto2.png", "lat": 53.57946, "lng": 10.02435 },
+      { "src": "foto/foto3.png", "lat": 53.57930, "lng": 10.02586 },
+      { "src": "foto/foto4.png", "lat": 53.57992, "lng": 10.02311 },
+      { "src": "foto/foto5.png", "lat": 53.58539, "lng": 10.01836 },
+      { "src": "foto/foto6.png", "lat": 53.59039, "lng": 10.01576 },
+      { "src": "foto/foto7.png", "lat": 53.58952, "lng": 10.01591 },
+      { "src": "foto/foto8.png", "lat": 53.58962, "lng": 10.00555 },
+      { "src": "foto/foto9.png", "lat": 53.59310, "lng": 10.00631 },
+      { "src": "foto/foto10.png", "lat": 53.59724, "lng": 10.00475 },
+      { "src": "foto/foto11.png", "lat": 53.59920, "lng": 10.00388 },
+      { "src": "foto/foto12.png", "lat": 53.58694, "lng": 10.01741 },
+      { "src": "foto/foto13.png", "lat": 53.60080, "lng": 9.99985 },
+      { "src": "foto/foto14.png", "lat": 53.59991, "lng": 9.99987 },
+      { "src": "foto/foto15.png", "lat": 45.49317, "lng": 9.21496 },
+      { "src": "foto/foto16.png", "lat": 45.49318, "lng": 9.21912 },
+      { "src": "foto/foto17.png", "lat": 53.59845, "lng": 9.99686 },
+      { "src": "foto/foto18.png", "lat": 45.49260, "lng": 9.21852 },
+      { "src": "foto/foto19.png", "lat": 45.48973, "lng": 9.20980 },
+      { "src": "foto/foto20.png", "lat": 45.49041, "lng": 9.21048 },
+      { "src": "foto/foto21.png", "lat": 45.49319, "lng": 9.21505 },
+      { "src": "foto/foto22.png", "lat": 45.48797, "lng": 9.21701 },
+      { "src": "foto/foto23.png", "lat": 45.48826, "lng": 9.21665 },
+      { "src": "foto/foto24.png", "lat": 45.48369, "lng": 9.22823 },
+      { "src": "foto/foto25.png", "lat": 45.48387, "lng": 9.22809 },
+      { "src": "foto/foto26.png", "lat": 45.48826, "lng": 9.22645 },
+      { "src": "foto/foto27.png", "lat": 45.47468, "lng": 9.20518 },
+      { "src": "foto/foto28.png", "lat": 45.48618, "lng": 9.23237 },
+      { "src": "foto/foto29.png", "lat": 45.48580, "lng": 9.23001 },
+      { "src": "foto/foto30.png", "lat": 45.48839, "lng": 9.22459 },
+      { "src": "foto/foto31.png", "lat": 45.49070, "lng": 9.22309 },
+      { "src": "foto/foto32.png", "lat": 45.49088, "lng": 9.21973 },
+      { "src": "foto/foto33.png", "lat": 52.49184, "lng": 13.45794 },
+      { "src": "foto/foto34.png", "lat": 52.52094, "lng": 13.48771 },
+      { "src": "foto/foto35.png", "lat": 52.52067, "lng": 13.49077 },
+      { "src": "foto/foto36.png", "lat": 52.52066, "lng": 13.49936 },
+      { "src": "foto/foto37.png", "lat": 51.36850, "lng": 12.34562 },
+      { "src": "foto/foto38.png", "lat": 51.36923, "lng": 12.34745 },
+      { "src": "foto/foto39.png", "lat": 53.07307, "lng": 8.82445 },
+      { "src": "foto/foto40.png", "lat": 51.36881, "lng": 12.34883 },
+      { "src": "foto/foto41.png", "lat": 51.36874, "lng": 12.34935 },
+      { "src": "foto/foto42.png", "lat": 46.07067, "lng": 11.11205 },
+      { "src": "foto/foto43.png", "lat": 51.36699, "lng": 12.34953 },
+      { "src": "foto/foto44.png", "lat": 51.36668, "lng": 12.34995 },
+      { "src": "foto/foto45.png", "lat": 51.36572, "lng": 12.35110 },
+      { "src": "foto/foto46.png", "lat": 51.36384, "lng": 12.35085 },
+      { "src": "foto/foto47.png", "lat": 51.36443, "lng": 12.34951 },
+      { "src": "foto/foto48.png", "lat": 51.36479, "lng": 12.34970 },
+      { "src": "foto/foto49.png", "lat": 51.36792, "lng": 12.34365 },
+      { "src": "foto/foto50.png", "lat": 51.36757, "lng": 12.34357 },
+      { "src": "foto/foto51.png", "lat": 53.60004, "lng": 10.00166 },
+      { "src": "foto/foto52.png", "lat": 52.52333, "lng": 13.49972 },
+      { "src": "foto/foto53.png", "lat": 52.48680, "lng": 13.45149 },
+      { "src": "foto/foto54.png", "lat": 45.49252, "lng": 9.21852 },
+      { "src": "foto/foto55.png", "lat": 45.48748, "lng": 9.21720 },
+      { "src": "foto/foto56.png", "lat": 45.48619, "lng": 9.21050 },
+      { "src": "foto/foto57.png", "lat": 45.49293, "lng": 9.21881 },
+      { "src": "foto/foto58.png", "lat": 45.49407, "lng": 9.22123 },
+      { "src": "foto/foto59.png", "lat": 52.50333, "lng": 13.37750 },
+      { "src": "foto/foto60.png", "lat": 45.49283, "lng": 9.22000 },
+      { "src": "foto/foto61.png", "lat": 45.48768, "lng": 9.22106 },
+      { "src": "foto/foto62.png", "lat": 52.50439, "lng": 13.37825 },
+      { "src": "foto/foto63.png", "lat": 52.49939, "lng": 13.38042 },
+      { "src": "foto/foto64.png", "lat": 52.49946, "lng": 13.46894 },
+      { "src": "foto/foto65.png", "lat": 52.50214, "lng": 13.37719 },
+      { "src": "foto/foto66.png", "lat": 45.49193, "lng": 9.22023 },
+      { "src": "foto/foto67.png", "lat": 45.48803, "lng": 9.21927 },
+      { "src": "foto/foto68.png", "lat": 45.50328, "lng": 9.22266 },
+      { "src": "foto/foto69.png", "lat": 45.49610, "lng": 9.21968 },
+      { "src": "foto/foto70.png", "lat": 45.50217, "lng": 9.22153 },
+      { "src": "foto/foto71.png", "lat": 51.36785, "lng": 12.34850 },
+      { "src": "foto/foto72.png", "lat": 45.50070, "lng": 9.22454 },
+      { "src": "foto/foto73.png", "lat": 45.49763, "lng": 9.21946 },
+      { "src": "foto/foto74.png", "lat": 45.49385, "lng": 9.22222 },
+      { "src": "foto/foto75.png", "lat": 45.50128, "lng": 9.22366 },
+      { "src": "foto/foto76.png", "lat": 51.33131, "lng": 12.40866 },
+      { "src": "foto/foto77.png", "lat": 51.33169, "lng": 12.41135 },
+      { "src": "foto/foto78.png", "lat": 51.36808, "lng": 12.34846 },
+      { "src": "foto/foto79.png", "lat": 45.49472, "lng": 9.22044 },
+      { "src": "foto/foto80.png", "lat": 51.36692, "lng": 12.34960 },
+      { "src": "foto/foto81.png", "lat": 51.36686, "lng": 12.34975 },
+      { "src": "foto/foto82.png", "lat": 51.35465, "lng": 12.31609 },
+      { "src": "foto/foto83.png", "lat": 51.36833, "lng": 12.34835 },
+      { "src": "foto/foto84.png", "lat": 51.36581, "lng": 12.34995 },
+      { "src": "foto/foto85.png", "lat": 51.33091, "lng": 12.40852 },
+      { "src": "foto/foto86.png", "lat": 45.49949, "lng": 9.22512 },
+      { "src": "foto/foto87.png", "lat": 51.36573, "lng": 12.34977 },
+      { "src": "foto/foto88.png", "lat": 45.48963, "lng": 9.21935 },
+      { "src": "foto/foto89.png", "lat": 52.55082, "lng": 13.40390 },
+      { "src": "foto/foto90.png", "lat": 52.55094, "lng": 13.40393 },
+      { "src": "foto/foto91.png", "lat": 52.54855, "lng": 13.41377 },
+      { "src": "foto/foto92.png", "lat": 47.75518, "lng": 13.95642 },
+      { "src": "foto/foto93.png", "lat": 45.50397, "lng": 9.22207 },
+      { "src": "foto/foto94.png", "lat": 51.36668, "lng": 12.34780 },
+      { "src": "foto/foto95.png", "lat": 45.49155, "lng": 9.22281 },
+      { "src": "foto/foto96.png", "lat": 45.49370, "lng": 9.22219 },
+      { "src": "foto/foto97.png", "lat": 51.36762, "lng": 12.34709 },
+      { "src": "foto/foto98.png", "lat": 51.36422, "lng": 12.35793 },
+      { "src": "foto/foto99.png", "lat": 51.34945, "lng": 12.37211 },
+      { "src": "foto/foto100.png", "lat": 51.36126, "lng": 12.36115 }
+    ];
+
+    // Leaflet Map initialisieren
+    const map = L.map('map');
+
+    // Basemap
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Fotos einfügen
+    koordinaten.forEach(p => {
+      const icon = L.divIcon({
+        className: 'foto-overlay',
+        html: `<img src="${p.src}">`,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25]
+      });
+      L.marker([p.lat, p.lng], { icon }).addTo(map);
+    });
+
+    // Automatisch an alle Fotos anpassen
+    const bounds = koordinaten.map(p => [p.lat, p.lng]);
+    if(bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+  </script>
+</body>
+</html>
